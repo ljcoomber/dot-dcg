@@ -89,8 +89,6 @@ test(edge_stmt_with_attributes) :-
     test_codes_match(edge(node0,node1,[attr(foo,bar)]), dot_dcg:edge_stmt,
                      'node0 -> node1 [foo=bar]').
     
-    format("Result: ~w~n", [X]).
-    
 
 %test(graph, [ setup(read_file_to_codes('test/test.dot', Result, [])) ]) :-
 %    format('~nResult: ~s~n', [Result]),
