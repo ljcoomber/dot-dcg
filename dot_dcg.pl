@@ -13,7 +13,7 @@
 
 % DOT Spec: graph : [ strict ] (graph | digraph) [ ID ] '{' stmt_list '}'
 % TODO: Support strict
-% TODO: Support graph
+% TODO: Support un-directed graph
 graph(digraph(Name, StmtList)) --> "digraph", w_spc, id(Name), w_spc,
     "{", w_spc, stmt_list(StmtList), w_spc, "}".
 
@@ -26,6 +26,7 @@ stmt_list([Stmt|Rest]) --> stmt(Stmt), w_spc_opt, ";", w_spc_opt, stmt_list(Rest
 % TODO: attr_stmt
 % TODO: ID =' ID
 stmt(NodeStmt) --> node_stmt(NodeStmt).
+stmt(EdgeStmt) --> edge_stmt(EdgeStmt).
 
 % DOT Spec: attr_stmt :	(graph | node | edge) attr_list
 % TODO
@@ -42,10 +43,16 @@ attr(attr(Name, Value)) --> id(Name), w_spc_opt, "=", w_spc_opt, id(Value), !.
 attr(attr(Name)) --> id(Name).            
 
 % DOT Spec: edge_stmt : (node_id | subgraph) edgeRHS [ attr_list ]
-% TODO
+% TODO: Subgraph
+edge_stmt(edge(Source, Target)) --> edge(Source, Target).
+edge_stmt(edge(Source, Target, AttrList)) --> edge(Source, Target), w_spc_opt,
+    attr_list(AttrList).
+edge(Source, Target) --> node_id(Source), w_spc_opt, edge_rhs(Target).
 
 % DOT Spec: edgeRHS : edgeop (node_id | subgraph) [ edgeRHS ]
-% TODO
+% TODO: Subgraph
+% TODO: Edge type              
+edge_rhs(TargetNodeId) --> edge_op, w_spc_opt, node_id(TargetNodeId).
 
 % DOT Spec: node_stmt : node_id [ attr_list ]
 node_stmt(node_stmt(NodeId)) --> node_id(NodeId).
@@ -101,7 +108,11 @@ quoted_string_body([C|String], true, Escaped, [C|Codes], Rest):-
 quoted_string_body([34], true, false, [34|Codes], Rest) :-
     % Closing quote - unify Rest with remainder of input
     Rest = Codes, !.
-                
+
+% Misc
+% TODO: Un-directed graph (--)
+edge_op --> "-", ">".
+
 % Mandatory white space
 w_spc --> w_spc_char, w_spc, !.
 w_spc --> w_spc_char, !.

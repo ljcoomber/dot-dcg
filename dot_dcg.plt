@@ -72,7 +72,7 @@ test(attr_list) :-
                      dot_dcg:attr_list,
                      '[foo=bar,foo2=bar2][foo3=bar3]').
 
-% Node
+% Nodes
 test(node_stmt_plain) :-
     test_codes_match(node_stmt(node0), dot_dcg:node_stmt, 'node0').
 
@@ -81,7 +81,15 @@ test(node_stmt_with_attributes) :-
                      dot_dcg:node_stmt,
                      'node0 [foo=bar][foo2=bar2]').
 
-% Statement
+% Edges
+test(edge_stmt_plain) :-
+    test_codes_match(edge(node0,node1), dot_dcg:edge_stmt, 'node0 -> node1').
+
+test(edge_stmt_with_attributes) :-
+    test_codes_match(edge(node0,node1,[attr(foo,bar)]), dot_dcg:edge_stmt,
+                     'node0 -> node1 [foo=bar]').
+    
+    format("Result: ~w~n", [X]).
     
 
 %test(graph, [ setup(read_file_to_codes('test/test.dot', Result, [])) ]) :-
