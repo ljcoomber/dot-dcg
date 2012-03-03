@@ -46,15 +46,16 @@ attr(attr(Name)) --> id(Name).
 
 % DOT Spec: edge_stmt : (node_id | subgraph) edgeRHS [ attr_list ]
 % TODO: Subgraph
-edge_stmt(edge_stmt(Source, Target, AttrList)) --> edge(Source, Target), w_spc_opt,
-    attr_list(AttrList), !.
-edge_stmt(edge(Source, Target)) --> edge(Source, Target).
-edge(Source, Target) --> node_id(Source), w_spc_opt, edge_rhs(Target).
+edge_stmt(edge(Nodes, AttrList)) --> edge(Nodes), w_spc_opt, attr_list(AttrList), !.
+edge_stmt(edge(Nodes)) --> edge(Nodes).
+edge([First|Rest]) --> node_id(First), w_spc_opt, edge_rhs(Rest).
 
 % DOT Spec: edgeRHS : edgeop (node_id | subgraph) [ edgeRHS ]
 % TODO: Subgraph
-% TODO: Edge type              
-edge_rhs(TargetNodeId) --> edge_op, w_spc_opt, node_id(TargetNodeId).
+% TODO: Edge type
+edge_rhs([Node|Rest]) --> edge_op, w_spc_opt, node_id(Node),
+    w_spc_opt, edge_rhs(Rest), !.
+edge_rhs([Node]) --> edge_op, w_spc_opt, node_id(Node).
 
 % DOT Spec: node_stmt : node_id [ attr_list ]
 node_stmt(node_stmt(NodeId, AttrList)) --> node_id(NodeId), w_spc, attr_list(AttrList).
