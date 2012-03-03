@@ -6,7 +6,7 @@
 % TODO: Allow logical lines to be separated by backslash and  newline
 % TODO: Allow double-quoted strings to be concatenated using a '+' operator
 % TODO: Support comments
-% TODO: Semi-colons are generally optional (see spec for exclusions)
+% TODO: Semi-colons are generally optional, but need to handle exlusion (see spec)
 % TODO: Keywords should be case-insensitive
 % TODO: Unify representation of quote and unquoted IDs
 % TODO: Enforcement of quoted keyword IDs
@@ -18,15 +18,17 @@ graph(digraph(Name, StmtList)) --> "digraph", w_spc, id(Name), w_spc,
     "{", w_spc, stmt_list(StmtList), w_spc, "}".
 
 % DOT Spec: stmt_list :	[ stmt [ ';' ] [ stmt_list ] ]
-stmt_list([Stmt|Rest]) --> stmt(Stmt), w_spc_opt, ";", w_spc_opt, stmt_list(Rest).
+stmt_list([Stmt|Rest]) --> stmt(Stmt), w_spc_opt, stmt_list(Rest), !.
+stmt_list([Stmt]) --> stmt(Stmt).
 
 % DOT Spec: stmt : node_stmt | edge_stmt | attr_stmt | ID '=' ID | subgraph
 % TODO: subgraph not implemented
-% TODO: edge_stmt not implemented
 % TODO: attr_stmt
 % TODO: ID =' ID
+stmt(EdgeStmt) --> edge_stmt(EdgeStmt), w_spc_opt, ";", !.
+stmt(EdgeStmt) --> edge_stmt(EdgeStmt), !.
+stmt(NodeStmt) --> node_stmt(NodeStmt), w_spc_opt, ";", !.
 stmt(NodeStmt) --> node_stmt(NodeStmt).
-stmt(EdgeStmt) --> edge_stmt(EdgeStmt).
 
 % DOT Spec: attr_stmt :	(graph | node | edge) attr_list
 % TODO
@@ -44,9 +46,9 @@ attr(attr(Name)) --> id(Name).
 
 % DOT Spec: edge_stmt : (node_id | subgraph) edgeRHS [ attr_list ]
 % TODO: Subgraph
+edge_stmt(edge_stmt(Source, Target, AttrList)) --> edge(Source, Target), w_spc_opt,
+    attr_list(AttrList), !.
 edge_stmt(edge(Source, Target)) --> edge(Source, Target).
-edge_stmt(edge(Source, Target, AttrList)) --> edge(Source, Target), w_spc_opt,
-    attr_list(AttrList).
 edge(Source, Target) --> node_id(Source), w_spc_opt, edge_rhs(Target).
 
 % DOT Spec: edgeRHS : edgeop (node_id | subgraph) [ edgeRHS ]
@@ -55,10 +57,12 @@ edge(Source, Target) --> node_id(Source), w_spc_opt, edge_rhs(Target).
 edge_rhs(TargetNodeId) --> edge_op, w_spc_opt, node_id(TargetNodeId).
 
 % DOT Spec: node_stmt : node_id [ attr_list ]
-node_stmt(node_stmt(NodeId)) --> node_id(NodeId).
 node_stmt(node_stmt(NodeId, AttrList)) --> node_id(NodeId), w_spc, attr_list(AttrList).
+node_stmt(node_stmt(NodeId)) --> node_id(NodeId).
+
 
 % DOT Spec: node_id : ID [ port ]
+% TODO: Port
 node_id(NodeId) --> id(NodeId).
 
 % DOT Spec: port: ':' ID [ ':' compass_pt ] | ':' compass_pt
