@@ -113,6 +113,13 @@ test(stmt_list_edges_semicolons) :-
                      dot_dcg:stmt_list, 'n0 -> n1 [foo=bar]; n2 -> n3').
 
 
+% DOT guide examples
+test(dot_guide_fig_1, [ setup(read_file_to_codes('test/fig_1_small_graph.dot',
+                                                 Result, [])) ]) :-
+    dot_dcg:graph(digraph(Name, Statements), Result, []),
+    assertion(Name = 'G'),
+    assertion(member(edge([main,parse,execute]), Statements)).
+
 %test(graph, [ setup(read_file_to_codes('test/test.dot', Result, [])) ]) :-
 %    format('~nResult: ~s~n', [Result]),
 %    dot_dcg:graph(X, Result, Y),
