@@ -1,5 +1,6 @@
 :- use_module(dot_dcg).
 :- use_module(library(readutil)).
+:- use_module(library(portray_text)).
 
 :- begin_tests(dot_dcg).
 
