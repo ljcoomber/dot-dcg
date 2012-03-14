@@ -97,7 +97,6 @@ numeral(Id, Codes, _Rest) :-
     catch(number_codes(Id, Codes), _Ex, fail).
 
 % Quoted string
-% TODO: Escaped quotes
 quoted_string(AString) --> quoted_string_body(String, false, false),
     { atom_codes(AString, String) }, !.
 
@@ -105,10 +104,18 @@ quoted_string_body([34|String], false, false, [34|Codes], Rest):-
     % First character is a quote
     quoted_string_body(String, true, false, Codes, Rest).
 
-quoted_string_body([C|String], true, Escaped, [C|Codes], Rest):-
+quoted_string_body([92|String], true, false, [92|Codes], Rest):-
+    % First character is a backslash (i.e., escape symbol)
+    quoted_string_body(String, true, true, Codes, Rest).
+
+quoted_string_body([C|String], true, true, [C|Codes], Rest):-
+    % Escaped is true, so just (blindly, for now) append whatever was escaped
+    quoted_string_body(String, true, false, Codes, Rest).
+
+quoted_string_body([C|String], true, false, [C|Codes], Rest):-
     % Character not a quote
     C \= 34,
-    quoted_string_body(String, true, Escaped, Codes, Rest).
+    quoted_string_body(String, true, false, Codes, Rest).
 
 quoted_string_body([34], true, false, [34|Codes], Rest) :-
     % Closing quote - unify Rest with remainder of input

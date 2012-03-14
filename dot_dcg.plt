@@ -40,6 +40,9 @@ test(id_symbol_list_fail, fail) :-
 test(id_quoted_string) :-
     test_codes_match('"Quoted String"', dot_dcg:id, '"Quoted String"').
 
+test(id_quoted_string_with_escaped_quote) :-
+    test_codes_match('"Quoted \\"String\\""', dot_dcg:id, '"Quoted \\"String\\""').
+
 % More in-depth tests for quoted strings
 test(quoted_string_plain) :-
     test_codes_match('"Quoted String"', dot_dcg:quoted_string, '"Quoted String"').
@@ -117,7 +120,9 @@ test(stmt_list_edges_semicolons) :-
 % DOT guide examples
 test(dot_guide_fig_1, [ setup(read_file_to_codes('test/fig_1_small_graph.dot',
                                                  Result, [])) ]) :-
+    debug,
     dot_dcg:graph(digraph(Name, Statements), Result, []),
+    nodebug,
     assertion(Name = 'G'),
     assertion(member(edge([main,parse,execute]), Statements)).
 
